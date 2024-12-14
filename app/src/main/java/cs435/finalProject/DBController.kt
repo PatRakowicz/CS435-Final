@@ -11,6 +11,8 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class DBController(context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -32,10 +34,10 @@ class DBController(context: Context) :
             );
         """.trimIndent()
 
-        val createHourlyTable = """
-            CREATE TABLE HourlyWeatherData (
+        val createQuarterTable = """
+            CREATE TABLE QuarterlyWeatherData (
                 _id INTEGER PRIMARY KEY AUTOINCREMENT,
-                hour TEXT NOT NULL UNIQUE,
+                quarter TEXT NOT NULL UNIQUE,
                 avg_temperature REAL NOT NULL,
                 avg_humidity REAL NOT NULL,
                 avg_uvi REAL NOT NULL,
@@ -44,13 +46,13 @@ class DBController(context: Context) :
         """.trimIndent()
 
         db?.execSQL(createTable)
-        db?.execSQL(createHourlyTable)
-        Log.d(TAG, "Tables created: WeatherData and HourlyWeatherData.")
+        db?.execSQL(createQuarterTable)
+//        Log.d(TAG, "Tables created: WeatherData and HourlyWeatherData.")
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         db?.execSQL("DROP TABLE IF EXISTS WeatherData")
-        db?.execSQL("DROP TABLE IF EXISTS HourlyWeatherData")
+        db?.execSQL("DROP TABLE IF EXISTS QuarterlyWeatherData")
         onCreate(db)
         Log.d(TAG, "Database upgraded. V:$newVersion")
     }
@@ -61,7 +63,7 @@ class DBController(context: Context) :
         var httpURLConnection: HttpURLConnection? = null
 
         try {
-            Log.d(TAG, "Attempting to fetch weather data from $apiUrl")
+//            Log.d(TAG, "Attempting to fetch weather data from $apiUrl")
             val url = URL(apiUrl)
             httpURLConnection = url.openConnection() as HttpURLConnection
             httpURLConnection.requestMethod = "GET"
@@ -125,7 +127,7 @@ class DBController(context: Context) :
                 "windspeed" to windspeed
             )
 
-            Log.d(TAG, "Latest weather data retrieved: $result")
+//            Log.d(TAG, "Latest weather data retrieved: $result")
             cursor.close()
             return result
         } else {
@@ -137,46 +139,64 @@ class DBController(context: Context) :
 
     fun quarterAverage() {
         val db = writableDatabase
-        val query = """
-            INSERT OR REPLACE INTO HourlyWeatherData (hour, avg_temperature, avg_humidity, avg_uvi, avg_windspeed)
-            SELECT 
-                strftime('%Y-%m-%d %M:00', date) AS hour,
-                AVG(temperature),
-                AVG(humidity),
-                AVG(uvi),
-                AVG(windspeed)
-            FROM WeatherData
-            GROUP BY hour;
-        """.trimIndent()
-        db.execSQL(query)
-        Log.d(TAG, "15-minute averages calculated and stored.")
-    }
 
-    fun delOldMinData() {
-        val db = writableDatabase
-        val query = """
-        date <= (
-            SELECT MAX(date)
-            FROM WeatherData
-            WHERE strftime('%Y-%m-%d %H:00', date) = (
-                SELECT MAX(hour)
-                FROM HourlyWeatherData
-            )
-        )
-    """.trimIndent()
+        val rowCount = db.query(
+            "WeatherData",
+            arrayOf("COUNT(*) AS count"),
+            null, null, null, null, null
+        ).use {
+            if (it.moveToFirst()) it.getInt(it.getColumnIndexOrThrow("count")) else 0
+        }
+        Log.d(TAG, "Current number of entries in WeatherData: $rowCount")
 
-        val deletedRows = db.delete("WeatherData", query, null)
-        Log.d(TAG, "$deletedRows rows deleted from WeatherData.")
+        if (rowCount >= 15) {
+            val currentQuarter = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+
+            val query = """
+                SELECT 
+                    AVG(temperature) AS avg_temperature, 
+                    AVG(humidity) AS avg_humidity, 
+                    AVG(uvi) AS avg_uvi, 
+                    AVG(windspeed) AS avg_windspeed 
+                FROM WeatherData
+                WHERE _id IN (
+                    SELECT _id FROM WeatherData ORDER BY _id DESC LIMIT 15
+                )
+            """.trimIndent()
+
+            val cursor = db.rawQuery(query, null)
+            if (cursor.moveToFirst()) {
+                val avgTemperature = cursor.getDouble(cursor.getColumnIndexOrThrow("avg_temperature"))
+                val avgHumidity = cursor.getDouble(cursor.getColumnIndexOrThrow("avg_humidity"))
+                val avgUvi = cursor.getDouble(cursor.getColumnIndexOrThrow("avg_uvi"))
+                val avgWindspeed = cursor.getDouble(cursor.getColumnIndexOrThrow("avg_windspeed"))
+
+                val contentValues = ContentValues().apply {
+                    put("quarter", currentQuarter)
+                    put("avg_temperature", avgTemperature)
+                    put("avg_humidity", avgHumidity)
+                    put("avg_uvi", avgUvi)
+                    put("avg_windspeed", avgWindspeed)
+                }
+
+                val inserted = db.insert("QuarterlyWeatherData", null, contentValues)
+                if (inserted != -1L) {
+                    db.execSQL("DELETE FROM WeatherData WHERE _id IN (SELECT _id FROM WeatherData ORDER BY _id DESC LIMIT 15)")
+                    Log.d(TAG, "Deleted 15 most recent entries from WeatherData.")
+                } else {
+                    Log.e(TAG, "Failed to insert quarter average.")
+                }
+            } else {
+                Log.w(TAG, "No data found for quarter average calculation.")
+            }
+            cursor.close()
+        } else {
+            Log.w(TAG, "Not enough entries in WeatherData to calculate average. Worker on standby.")
+        }
     }
 
     fun getQuarterData(): Cursor {
         val db = readableDatabase
-        val query = """
-            SELECT _id, strftime('%Y-%m-%d %H:%M', date) AS time, AVG(temperature) AS avg_temperature 
-            FROM WeatherData
-            GROUP BY strftime('%Y-%m-%d %H:%M', date)
-            ORDER BY time DESC
-        """.trimIndent()
-        return db.rawQuery(query, null)
+        return db.rawQuery("SELECT * FROM QuarterlyWeatherData ORDER BY quarter DESC", null)
     }
 }
