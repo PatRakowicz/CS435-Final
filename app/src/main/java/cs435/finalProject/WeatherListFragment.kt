@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
 import android.widget.SimpleCursorAdapter
+import android.widget.Toast
 
 class WeatherListFragment : Fragment() {
     private lateinit var db: DBController
@@ -33,17 +34,22 @@ class WeatherListFragment : Fragment() {
     private fun populateListView() {
         try {
             val cursor: Cursor = db.getHourlyWeather()
-            Log.d(TAG, "populateListView: Cursor loaded with ${cursor.count} rows.")
-            val adapter = SimpleCursorAdapter(
-                requireContext(),
-                android.R.layout.simple_list_item_2,
-                cursor,
-                arrayOf("hour", "avg_temperature"),
-                intArrayOf(android.R.id.text1, android.R.id.text2),
-                0
-            )
-            listView.adapter = adapter
-            Log.d(TAG, "populateListView: ListView adapter set.")
+            if (cursor.count == 0) {
+                Toast.makeText(requireContext(), "No weather data available.", Toast.LENGTH_SHORT).show()
+                Log.w(TAG, "populateListView: No data found.")
+            } else {
+                Log.d(TAG, "populateListView: Cursor loaded with ${cursor.count} rows.")
+                val adapter = SimpleCursorAdapter(
+                    requireContext(),
+                    android.R.layout.simple_list_item_2,
+                    cursor,
+                    arrayOf("hour", "avg_temperature"),
+                    intArrayOf(android.R.id.text1, android.R.id.text2),
+                    0
+                )
+                listView.adapter = adapter
+                Log.d(TAG, "populateListView: ListView adapter set.")
+            }
         } catch (e: Exception) {
             Log.e(TAG, "populateListView: Error loading data - ${e.message}", e)
         }
