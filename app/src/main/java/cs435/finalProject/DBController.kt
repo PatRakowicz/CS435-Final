@@ -37,7 +37,7 @@ class DBController(context: Context) :
         val createQuarterTable = """
             CREATE TABLE QuarterlyWeatherData (
                 _id INTEGER PRIMARY KEY AUTOINCREMENT,
-                quarter TEXT NOT NULL,
+                quarter TEXT NOT NULL UNIQUE,
                 avg_temperature REAL NOT NULL,
                 avg_humidity REAL NOT NULL,
                 avg_uvi REAL NOT NULL,
@@ -157,7 +157,7 @@ class DBController(context: Context) :
 
         if (rowCount >= 15) {
             val currentQuarter =
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"))
 
             val averagesCursor = db.query(
                 "WeatherData",
@@ -189,15 +189,14 @@ class DBController(context: Context) :
                     put("avg_windspeed", avgWindspeed)
                 }
 
-                val inserted = db.insert("QuarterlyWeatherData", null, contentValues)
-
-
-                if (inserted != -1L) {
+                try {
+                    db.insertOrThrow("QuarterlyWeatherData", null, contentValues)
                     Log.d(TAG, "Data pushed to QuarterlyWeatherData: $contentValues")
+
                     db.execSQL("DELETE FROM WeatherData WHERE _id IN (SELECT _id FROM WeatherData ORDER BY _id DESC LIMIT 15)")
                     Log.d(TAG, "Deleted 15 most recent entries from WeatherData.")
-                } else {
-                    Log.e(TAG, "Failed to insert quarter average.")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Duplicate quarter entry detected, skipping insertion.")
                 }
             } else {
                 Log.w(TAG, "No data found for quarter average calculation.")
