@@ -22,6 +22,7 @@ class DBController(context: Context) :
         private const val TAG = "DBController"
     }
 
+    //https://developer.android.com/topic/performance/sqlite-performance-best-practices
     override fun onCreate(db: SQLiteDatabase?) {
         val createTable = """
             CREATE TABLE WeatherData (
@@ -157,7 +158,7 @@ class DBController(context: Context) :
 
         if (rowCount >= 15) {
             val currentQuarter =
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"))
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))
 
             val averagesCursor = db.query(
                 "WeatherData",
@@ -190,6 +191,7 @@ class DBController(context: Context) :
                 }
 
                 try {
+                    //https://stackoverflow.com/questions/38225725/android-when-does-insertorthrow-throw-an-exception
                     db.insertOrThrow("QuarterlyWeatherData", null, contentValues)
                     Log.d(TAG, "Data pushed to QuarterlyWeatherData: $contentValues")
 

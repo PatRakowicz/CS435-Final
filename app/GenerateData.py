@@ -20,7 +20,7 @@ def get_weather():
     global simulated_time
 
     weather_data = generate_weather_data()
-    weather_data["timestamp"] = simulated_time.strftime("%Y-%m-%dT%H:%M:%SZ")
+    weather_data["timestamp"] = simulated_time.strftime("%Y-%m-%dT%H:%M:%S")
 
     print(f"Generated Weather Data: {weather_data}")
 
