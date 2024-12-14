@@ -60,6 +60,12 @@ class MainActivity : AppCompatActivity() {
         scheduleWorker()
     }
 
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "MainActivity resumed - refreshing weather display.")
+        updateWeatherDisplay()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_toolbar, menu)
         return true
