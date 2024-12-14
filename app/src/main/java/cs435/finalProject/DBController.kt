@@ -30,8 +30,21 @@ class DBController (context: Context): SQLiteOpenHelper(context, DATABASE_NAME, 
                 windspeed REAL NOT NULL
             );
         """.trimIndent()
+
+        val createHourlyTable = """
+            CREATE TABLE HourlyWeatherData (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            hour TEXT NOT NULL,
+            avg_temperature REAL NOT NULL,
+            avg_humidity REAL NOT NULL,
+            avg_uvi REAL NOT NULL,
+            avg_windspeed REAL NOT NULL
+        );
+        """.trimIndent()
+
         db?.execSQL(createTable)
-        Log.d(TAG, "Database created with table WeatherData.")
+        db?.execSQL(createHourlyTable)
+        Log.d(TAG, "Tables created: WeatherData and HourlyWeatherData.")
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
