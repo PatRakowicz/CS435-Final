@@ -11,6 +11,7 @@ import androidx.core.view.WindowInsetsCompat
 class SettingsActivity : AppCompatActivity() {
     private lateinit var tempSwitch: Switch
     private lateinit var windSwitch: Switch
+    private lateinit var centerTextSwitch: Switch
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,9 +25,11 @@ class SettingsActivity : AppCompatActivity() {
 
         tempSwitch = findViewById(R.id.tempSwitch)
         windSwitch = findViewById(R.id.windSwitch)
+        centerTextSwitch = findViewById(R.id.centerTextSwitch)
 
         tempSwitch.isChecked = AppSettings.isFahrenheit
         windSwitch.isChecked = AppSettings.isMilesPerHour
+        centerTextSwitch.isChecked = AppSettings.isCenteredText
 
         tempSwitch.setOnCheckedChangeListener { _, isChecked ->
             AppSettings.isFahrenheit = isChecked
@@ -35,6 +38,11 @@ class SettingsActivity : AppCompatActivity() {
 
         windSwitch.setOnCheckedChangeListener { _, isChecked ->
             AppSettings.isMilesPerHour = isChecked
+            setResult(Activity.RESULT_OK)
+        }
+
+        centerTextSwitch.setOnCheckedChangeListener { compoundButton, isChecked ->
+            AppSettings.isCenteredText = isChecked
             setResult(Activity.RESULT_OK)
         }
     }

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -131,6 +132,15 @@ class MainActivity : AppCompatActivity() {
                 windspeed.text = "Wind Speed: %.2f %s".format(displayWindSpeed, windSpeedUnit)
                 timestamp.text = "Last Update: ${latestWeather["date"]}"
 //                Log.d(TAG, "UI updated with latest weather data.")
+
+                val textAlignment =
+                    if (AppSettings.isCenteredText) View.TEXT_ALIGNMENT_CENTER
+                    else View.TEXT_ALIGNMENT_TEXT_START
+                temperature.textAlignment = textAlignment
+                humidity.textAlignment = textAlignment
+                uvi.textAlignment = textAlignment
+                windspeed.textAlignment = textAlignment
+                timestamp.textAlignment = textAlignment
             } else {
                 timestamp.text = "No Data Available"
                 Log.w(TAG, "UI update failed: No data found.")
