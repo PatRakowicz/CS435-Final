@@ -13,10 +13,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import androidx.work.Worker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -124,7 +122,7 @@ class MainActivity : AppCompatActivity() {
 
     // https://medium.com/androiddevelopers/workmanager-periodicity-ff35185ff006
     private fun scheduleWorker() {
-        val workRequest = PeriodicWorkRequestBuilder<cs435.finalProject.Worker>(15, TimeUnit.MINUTES).build()
+        val workRequest = PeriodicWorkRequestBuilder<WeatherDataWorker>(15, TimeUnit.MINUTES).build()
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             "WeatherDataWorker",
             ExistingPeriodicWorkPolicy.KEEP,
