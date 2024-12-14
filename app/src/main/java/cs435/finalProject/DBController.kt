@@ -35,12 +35,12 @@ class DBController(context: Context) :
         val createHourlyTable = """
             CREATE TABLE HourlyWeatherData (
                 _id INTEGER PRIMARY KEY AUTOINCREMENT,
-                hour TEXT NOT NULL,
+                hour TEXT NOT NULL UNIQUE,
                 avg_temperature REAL NOT NULL,
                 avg_humidity REAL NOT NULL,
                 avg_uvi REAL NOT NULL,
                 avg_windspeed REAL NOT NULL
-        );
+            );
         """.trimIndent()
 
         db?.execSQL(createTable)
@@ -135,40 +135,47 @@ class DBController(context: Context) :
         }
     }
 
-    fun hourlyAverage() {
+    fun quarterAverage() {
         val db = writableDatabase
-
-        val insertQuery = """
-            INSERT INTO HourlyWeatherData (hour, avg_temperature, avg_humidity, avg_uvi, avg_windspeed)
+        val query = """
+            INSERT OR REPLACE INTO HourlyWeatherData (hour, avg_temperature, avg_humidity, avg_uvi, avg_windspeed)
             SELECT 
-                strftime('%Y-%m-%d %H:%M:00', date) AS hour,
-                AVG(temperature), 
-                AVG(humidity), 
-                AVG(uvi), 
+                strftime('%Y-%m-%d %M:00', date) AS hour,
+                AVG(temperature),
+                AVG(humidity),
+                AVG(uvi),
                 AVG(windspeed)
             FROM WeatherData
-            WHERE date >= datetime('now', '-15 minutes') AND date <= datetime('now')
             GROUP BY hour;
         """.trimIndent()
-
-        try {
-            db.execSQL(insertQuery)
-            Log.d(TAG, "15-minute average computed and inserted into HourlyWeatherData.")
-
-            val deletedRows =
-                db.delete("WeatherData", "date <= datetime('now', '-15 minutes')", null)
-            Log.d(TAG, "$deletedRows old minute-level entries deleted from WeatherData.")
-        } catch (e: Exception) {
-            Log.e(TAG, "Error computing 15-minute average: ${e.message}", e)
-        }
+        db.execSQL(query)
+        Log.d(TAG, "15-minute averages calculated and stored.")
     }
 
-    fun getHourlyWeather(): Cursor {
+    fun delOldMinData() {
+        val db = writableDatabase
+        val query = """
+        date <= (
+            SELECT MAX(date)
+            FROM WeatherData
+            WHERE strftime('%Y-%m-%d %H:00', date) = (
+                SELECT MAX(hour)
+                FROM HourlyWeatherData
+            )
+        )
+    """.trimIndent()
+
+        val deletedRows = db.delete("WeatherData", query, null)
+        Log.d(TAG, "$deletedRows rows deleted from WeatherData.")
+    }
+
+    fun getQuarterData(): Cursor {
         val db = readableDatabase
         val query = """
-            SELECT _id, hour, avg_temperature 
-            FROM HourlyWeatherData 
-            ORDER BY hour DESC
+            SELECT _id, strftime('%Y-%m-%d %H:%M', date) AS time, AVG(temperature) AS avg_temperature 
+            FROM WeatherData
+            GROUP BY strftime('%Y-%m-%d %H:%M', date)
+            ORDER BY time DESC
         """.trimIndent()
         return db.rawQuery(query, null)
     }

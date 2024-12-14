@@ -32,7 +32,7 @@ class WeatherListFragment : Fragment() {
     }
 
     private fun populateListView() {
-        val cursor: Cursor = db.getHourlyWeather()
+        val cursor: Cursor = db.getQuarterData()
         try {
             if (cursor.count == 0) {
                 Toast.makeText(requireContext(), "No weather data available.", Toast.LENGTH_SHORT).show()
@@ -43,7 +43,7 @@ class WeatherListFragment : Fragment() {
                     requireContext(),
                     android.R.layout.simple_list_item_2,
                     cursor,
-                    arrayOf("hour", "avg_temperature"),
+                    arrayOf("time", "avg_temperature"),
                     intArrayOf(android.R.id.text1, android.R.id.text2),
                     0
                 )
@@ -52,8 +52,6 @@ class WeatherListFragment : Fragment() {
             }
         } catch (e: Exception) {
             Log.e(TAG, "populateListView: Error loading data - ${e.message}", e)
-        } finally {
-            cursor.close()
         }
     }
 }

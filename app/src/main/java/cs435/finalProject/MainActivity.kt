@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         timestamp = findViewById(R.id.timestamp)
 
         startWeatherFetch()
-        scheduleWorker()
+        scheduleQuarterWorker()
     }
 
     override fun onResume() {
@@ -138,9 +138,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun scheduleWorker() {
-        val workRequest = PeriodicWorkRequestBuilder<WeatherDataWorker>(15, TimeUnit.MINUTES).build()
+    private fun scheduleQuarterWorker() {
+        val workRequest = PeriodicWorkRequestBuilder<HourlyWorker>(15, TimeUnit.MINUTES).build()
         WorkManager.getInstance(this).enqueue(workRequest)
-        Log.d(TAG, "Weather data worker scheduled.")
     }
 }
