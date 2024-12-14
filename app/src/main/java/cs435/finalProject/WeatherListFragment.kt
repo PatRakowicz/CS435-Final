@@ -32,8 +32,8 @@ class WeatherListFragment : Fragment() {
     }
 
     private fun populateListView() {
+        val cursor: Cursor = db.getHourlyWeather()
         try {
-            val cursor: Cursor = db.getHourlyWeather()
             if (cursor.count == 0) {
                 Toast.makeText(requireContext(), "No weather data available.", Toast.LENGTH_SHORT).show()
                 Log.w(TAG, "populateListView: No data found.")
@@ -52,6 +52,8 @@ class WeatherListFragment : Fragment() {
             }
         } catch (e: Exception) {
             Log.e(TAG, "populateListView: Error loading data - ${e.message}", e)
+        } finally {
+            cursor.close()
         }
     }
 }

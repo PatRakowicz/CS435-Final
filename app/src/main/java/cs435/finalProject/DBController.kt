@@ -12,7 +12,8 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 
-class DBController (context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+class DBController(context: Context) :
+    SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     companion object {
         private const val DATABASE_NAME = "weather.db"
         private const val DATABASE_VERSION = 1
@@ -66,7 +67,8 @@ class DBController (context: Context): SQLiteOpenHelper(context, DATABASE_NAME, 
             httpURLConnection.requestMethod = "GET"
 
             if (httpURLConnection.responseCode == HttpURLConnection.HTTP_OK) {
-                val bufferedReader = BufferedReader(InputStreamReader(httpURLConnection.inputStream))
+                val bufferedReader =
+                    BufferedReader(InputStreamReader(httpURLConnection.inputStream))
                 val result = bufferedReader.readText()
                 bufferedReader.close()
 
@@ -88,7 +90,10 @@ class DBController (context: Context): SQLiteOpenHelper(context, DATABASE_NAME, 
                 db.insert("WeatherData", null, contentValue)
                 Log.d(TAG, "Data inserted successfully: $contentValue")
             } else {
-                Log.e(TAG, "Failed to fetch weather data. Response Code: ${httpURLConnection.responseCode}")
+                Log.e(
+                    TAG,
+                    "Failed to fetch weather data. Response Code: ${httpURLConnection.responseCode}"
+                )
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error fetching weather data: ${e.message}", e)
@@ -100,7 +105,8 @@ class DBController (context: Context): SQLiteOpenHelper(context, DATABASE_NAME, 
 
     fun getLatestWeatherEntry(): Map<String, Any>? {
         val db = readableDatabase
-        val query = "SELECT date, temperature, humidity, uvi, windspeed FROM WeatherData ORDER BY date DESC LIMIT 1"
+        val query =
+            "SELECT date, temperature, humidity, uvi, windspeed FROM WeatherData ORDER BY date DESC LIMIT 1"
 
         val cursor = db.rawQuery(query, null)
 
@@ -131,17 +137,30 @@ class DBController (context: Context): SQLiteOpenHelper(context, DATABASE_NAME, 
 
     fun hourlyAverage() {
         val db = writableDatabase
-        val query = """
-        INSERT INTO HourlyWeatherData (hour, avg_temperature, avg_humidity, avg_uvi, avg_windspeed)
-        SELECT strftime('%Y-%m-%d %H:%M:00', date) as hour,
-            AVG(temperature), AVG(humidity), AVG(uvi), AVG(windspeed)
-        FROM WeatherData
-        WHERE date >= datetime('now', '-15 minutes') AND date <= datetime('now')
-        GROUP BY hour;
-    """.trimIndent()
-        db.execSQL(query)
-        db.delete("WeatherData", "date <= datetime('now', '-15 minutes')", null)
-        Log.d(TAG, "15-minute average computed and old data deleted.")
+
+        val insertQuery = """
+            INSERT INTO HourlyWeatherData (hour, avg_temperature, avg_humidity, avg_uvi, avg_windspeed)
+            SELECT 
+                strftime('%Y-%m-%d %H:%M:00', date) AS hour,
+                AVG(temperature), 
+                AVG(humidity), 
+                AVG(uvi), 
+                AVG(windspeed)
+            FROM WeatherData
+            WHERE date >= datetime('now', '-15 minutes') AND date <= datetime('now')
+            GROUP BY hour;
+        """.trimIndent()
+
+        try {
+            db.execSQL(insertQuery)
+            Log.d(TAG, "15-minute average computed and inserted into HourlyWeatherData.")
+
+            val deletedRows =
+                db.delete("WeatherData", "date <= datetime('now', '-15 minutes')", null)
+            Log.d(TAG, "$deletedRows old minute-level entries deleted from WeatherData.")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error computing 15-minute average: ${e.message}", e)
+        }
     }
 
     fun getHourlyWeather(): Cursor {
