@@ -43,12 +43,11 @@ class WeatherListFragment : Fragment() {
                     requireContext(),
                     android.R.layout.simple_list_item_2,
                     cursor,
-                    arrayOf("time", "avg_temperature"),
+                    arrayOf("quarter", "avg_temperature"),
                     intArrayOf(android.R.id.text1, android.R.id.text2),
                     0
                 )
                 listView.adapter = adapter
-                Log.d(TAG, "populateListView: ListView adapter set.")
             }
         } catch (e: Exception) {
             Log.e(TAG, "populateListView: Error loading data - ${e.message}", e)
