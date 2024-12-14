@@ -58,6 +58,7 @@ class MainActivity : AppCompatActivity() {
         timestamp = findViewById(R.id.timestamp)
 
         startWeatherFetch()
+        scheduleWorker()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -121,8 +122,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // https://medium.com/androiddevelopers/workmanager-periodicity-ff35185ff006
     private fun scheduleWorker() {
-        val workRequest = PeriodicWorkRequestBuilder<Worker>(1, TimeUnit.HOURS).build()
-        WorkManager.getInstance(this).enqueue(workRequest)
+        val workRequest = PeriodicWorkRequestBuilder<cs435.finalProject.Worker>(1, TimeUnit.HOURS).build()
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "WeatherDataWorker",
+            ExistingPeriodicWorkPolicy.KEEP,
+            workRequest
+        )
     }
 }
