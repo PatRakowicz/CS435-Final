@@ -193,6 +193,7 @@ class DBController(context: Context) :
 
 
                 if (inserted != -1L) {
+                    Log.d(TAG, "Data pushed to QuarterlyWeatherData: $contentValues")
                     db.execSQL("DELETE FROM WeatherData WHERE _id IN (SELECT _id FROM WeatherData ORDER BY _id DESC LIMIT 15)")
                     Log.d(TAG, "Deleted 15 most recent entries from WeatherData.")
                 } else {
