@@ -10,6 +10,7 @@ import androidx.core.view.WindowInsetsCompat
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var tempSwitch: Switch
+    private lateinit var windSwitch: Switch
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,10 +23,18 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         tempSwitch = findViewById(R.id.tempSwitch)
+        windSwitch = findViewById(R.id.windSwitch)
+
         tempSwitch.isChecked = AppSettings.isFahrenheit
+        windSwitch.isChecked = AppSettings.isMilesPerHour
 
         tempSwitch.setOnCheckedChangeListener { _, isChecked ->
             AppSettings.isFahrenheit = isChecked
+            setResult(Activity.RESULT_OK)
+        }
+
+        windSwitch.setOnCheckedChangeListener { _, isChecked ->
+            AppSettings.isMilesPerHour = isChecked
             setResult(Activity.RESULT_OK)
         }
     }

@@ -115,14 +115,19 @@ class MainActivity : AppCompatActivity() {
 
         runOnUiThread {
             if (latestWeather != null) {
-                val tempC = latestWeather["temperature"] as Double
-                val displayTemp = if (AppSettings.isFahrenheit) (tempC * 9 / 5) + 32 else tempC
+                val tempVal = latestWeather["temperature"] as Double
+                val windSpeedVal = latestWeather["windspeed"] as Double
+
+                val displayTemp = if (AppSettings.isFahrenheit) (tempVal * 9 / 5) + 32 else tempVal
                 val tempUnit = if (AppSettings.isFahrenheit) "°F" else "°C"
 
-                temperature.text = "Temperature: $displayTemp$tempUnit"
-                humidity.text = "Humidity: ${latestWeather["humidity"]}%"
-                uvi.text = "UV Index: ${latestWeather["uvi"]}"
-                windspeed.text = "Wind Speed: ${latestWeather["windspeed"]} m/s"
+                val displayWindSpeed = if (AppSettings.isMilesPerHour) windSpeedVal * 2.23694 else windSpeedVal
+                val windSpeedUnit = if (AppSettings.isMilesPerHour) "mph" else "m/s"
+
+                temperature.text = "Temperature: %.2f%s".format(displayTemp, tempUnit)
+                humidity.text = "Humidity: %.2f%%".format(latestWeather["humidity"] as Double)
+                uvi.text = "UV Index: %.2f".format(latestWeather["uvi"] as Double)
+                windspeed.text = "Wind Speed: %.2f %s".format(displayWindSpeed, windSpeedUnit)
                 timestamp.text = "Last Update: ${latestWeather["date"]}"
                 Log.d(TAG, "UI updated with latest weather data.")
             } else {

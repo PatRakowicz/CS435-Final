@@ -21,8 +21,18 @@
         android:id="@+id/tempSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minWidth="64dp"
-        android:minHeight="48dp"
-        android:padding="12dp"
         android:text="Show in Fahrenheit" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Wind Speed Unit"
+        android:textSize="18sp" />
+
+    <Switch
+        android:id="@+id/windSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show in mph" />
 </LinearLayout>
