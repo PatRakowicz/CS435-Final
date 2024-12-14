@@ -15,7 +15,7 @@ class HourlyWorker(context: Context, workerParameters: WorkerParameters) : Worke
         return try {
             db.quarterAverage()
             db.delOldMinData()
-            Log.d(TAG, "15-minute average data processed.")
+//            Log.d(TAG, "15-minute average data processed.")
             Result.success()
         } catch (e: Exception) {
             Log.e(TAG, "Error processing 15-minute data: ${e.message}", e)

@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        Log.d(TAG, "MainActivity resumed - refreshing weather display.")
+//        Log.d(TAG, "MainActivity resumed - refreshing weather display.")
         updateWeatherDisplay()
     }
 
@@ -96,13 +96,13 @@ class MainActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             while (true) {
                 try {
-                    Log.d(TAG, "Fetching weather data from API...")
+//                    Log.d(TAG, "Fetching weather data from API...")
                     db.fetchWeatherData("10.40.20.11:8000")
-                    Log.d(TAG, "Weather data fetched and inserted.")
+//                    Log.d(TAG, "Weather data fetched and inserted.")
 
                     updateWeatherDisplay()
 
-                    Log.d("WeatherFetch", "Weather data fetched and displayed")
+//                    Log.d("WeatherFetch", "Weather data fetched and displayed")
                 } catch (e: Exception) {
                     Log.e(TAG, "Error during weather data fetch: ${e.message}", e)
                 }
@@ -130,7 +130,7 @@ class MainActivity : AppCompatActivity() {
                 uvi.text = "UV Index: %.2f".format(latestWeather["uvi"] as Double)
                 windspeed.text = "Wind Speed: %.2f %s".format(displayWindSpeed, windSpeedUnit)
                 timestamp.text = "Last Update: ${latestWeather["date"]}"
-                Log.d(TAG, "UI updated with latest weather data.")
+//                Log.d(TAG, "UI updated with latest weather data.")
             } else {
                 timestamp.text = "No Data Available"
                 Log.w(TAG, "UI update failed: No data found.")
