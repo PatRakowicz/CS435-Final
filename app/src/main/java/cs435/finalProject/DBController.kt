@@ -37,7 +37,7 @@ class DBController(context: Context) :
         val createQuarterTable = """
             CREATE TABLE QuarterlyWeatherData (
                 _id INTEGER PRIMARY KEY AUTOINCREMENT,
-                quarter TEXT NOT NULL UNIQUE,
+                quarter TEXT NOT NULL,
                 avg_temperature REAL NOT NULL,
                 avg_humidity REAL NOT NULL,
                 avg_uvi REAL NOT NULL,
@@ -140,36 +140,44 @@ class DBController(context: Context) :
     fun quarterAverage() {
         val db = writableDatabase
 
-        val rowCount = db.query(
+        val cursor = db.query(
             "WeatherData",
             arrayOf("COUNT(*) AS count"),
             null, null, null, null, null
-        ).use {
-            if (it.moveToFirst()) it.getInt(it.getColumnIndexOrThrow("count")) else 0
+        )
+        val rowCount = if (cursor.moveToFirst()) {
+            cursor.getInt(cursor.getColumnIndexOrThrow("count"))
+        } else {
+            0
         }
+        cursor.close()
         Log.d(TAG, "Current number of entries in WeatherData: $rowCount")
 
         if (rowCount >= 15) {
-            val currentQuarter = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+            val currentQuarter =
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
 
-            val query = """
-                SELECT 
-                    AVG(temperature) AS avg_temperature, 
-                    AVG(humidity) AS avg_humidity, 
-                    AVG(uvi) AS avg_uvi, 
-                    AVG(windspeed) AS avg_windspeed 
-                FROM WeatherData
-                WHERE _id IN (
-                    SELECT _id FROM WeatherData ORDER BY _id DESC LIMIT 15
-                )
-            """.trimIndent()
+            val averagesCursor = db.query(
+                "WeatherData",
+                arrayOf(
+                    "AVG(temperature) AS avg_temperature",
+                    "AVG(humidity) AS avg_humidity",
+                    "AVG(uvi) AS avg_uvi",
+                    "AVG(windspeed) AS avg_windspeed"
+                ),
+                "_id IN (SELECT _id FROM WeatherData ORDER BY _id DESC LIMIT 15)",
+                null, null, null, null
+            )
 
-            val cursor = db.rawQuery(query, null)
-            if (cursor.moveToFirst()) {
-                val avgTemperature = cursor.getDouble(cursor.getColumnIndexOrThrow("avg_temperature"))
-                val avgHumidity = cursor.getDouble(cursor.getColumnIndexOrThrow("avg_humidity"))
-                val avgUvi = cursor.getDouble(cursor.getColumnIndexOrThrow("avg_uvi"))
-                val avgWindspeed = cursor.getDouble(cursor.getColumnIndexOrThrow("avg_windspeed"))
+            if (averagesCursor.moveToFirst()) {
+                val avgTemperature =
+                    averagesCursor.getDouble(averagesCursor.getColumnIndexOrThrow("avg_temperature"))
+                val avgHumidity =
+                    averagesCursor.getDouble(averagesCursor.getColumnIndexOrThrow("avg_humidity"))
+                val avgUvi =
+                    averagesCursor.getDouble(averagesCursor.getColumnIndexOrThrow("avg_uvi"))
+                val avgWindspeed =
+                    averagesCursor.getDouble(averagesCursor.getColumnIndexOrThrow("avg_windspeed"))
 
                 val contentValues = ContentValues().apply {
                     put("quarter", currentQuarter)
@@ -180,6 +188,8 @@ class DBController(context: Context) :
                 }
 
                 val inserted = db.insert("QuarterlyWeatherData", null, contentValues)
+
+
                 if (inserted != -1L) {
                     db.execSQL("DELETE FROM WeatherData WHERE _id IN (SELECT _id FROM WeatherData ORDER BY _id DESC LIMIT 15)")
                     Log.d(TAG, "Deleted 15 most recent entries from WeatherData.")
@@ -189,7 +199,7 @@ class DBController(context: Context) :
             } else {
                 Log.w(TAG, "No data found for quarter average calculation.")
             }
-            cursor.close()
+            averagesCursor.close()
         } else {
             Log.w(TAG, "Not enough entries in WeatherData to calculate average. Worker on standby.")
         }
