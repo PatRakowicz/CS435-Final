@@ -1,5 +1,6 @@
 package cs435.finalProject
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -76,7 +77,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.settings_action -> {
-                // Setttings action -> Push into settings fragment
+                // Setttings action -> Push into settings activity
+                startActivity(Intent(this, SettingsActivity::class.java))
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -107,15 +109,19 @@ class MainActivity : AppCompatActivity() {
 
         runOnUiThread {
             if (latestWeather != null) {
-                temperature.text = "Temperature: ${latestWeather["temperature"]}°C"
+                val tempC = latestWeather["temperature"] as Double
+                val displayTemp = if (AppSettings.isFahrenheit) (tempC * 9 / 5) + 32 else tempC
+                val tempUnit = if (AppSettings.isFahrenheit) "°F" else "°C"
+
+                temperature.text = "Temperature: $displayTemp$tempUnit"
                 humidity.text = "Humidity: ${latestWeather["humidity"]}%"
                 uvi.text = "UV Index: ${latestWeather["uvi"]}"
                 windspeed.text = "Wind Speed: ${latestWeather["windspeed"]} m/s"
                 timestamp.text = "Last Update: ${latestWeather["date"]}"
-                Log.d(TAG, "UI updated successfully with latest weather data.")
+                Log.d(TAG, "UI updated with latest weather data.")
             } else {
                 timestamp.text = "No Data Available"
-                Log.w(TAG, "UI update failed: No data found in database.")
+                Log.w(TAG, "UI update failed: No data found.")
             }
         }
     }
@@ -123,6 +129,11 @@ class MainActivity : AppCompatActivity() {
     // https://medium.com/androiddevelopers/workmanager-periodicity-ff35185ff006
     private fun scheduleWorker() {
         val workRequest = PeriodicWorkRequestBuilder<WeatherDataWorker>(15, TimeUnit.MINUTES).build()
-        WorkManager.getInstance(this).enqueue(workRequest)
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "WeatherDataWorker",
+            ExistingPeriodicWorkPolicy.UPDATE,
+            workRequest
+        )
+        Log.d(TAG, "Weather data worker scheduled.")
     }
 }
