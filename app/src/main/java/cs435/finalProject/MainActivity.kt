@@ -68,7 +68,11 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.history_action -> {
-                // History action -> Push into history view fragment
+                // History action -> Attach Weather List to main
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.main, WeatherListFragment())
+                    .addToBackStack(null)
+                    .commit()
                 true
             }
 
