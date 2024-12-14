@@ -9,9 +9,14 @@ class WeatherDataWorker(context: Context, parameters: WorkerParameters) : Worker
     private val db = DBController(context)
 
     override fun doWork(): Result {
-        Log.d("WeatherDataWorker", "Worker is executing hourlyAverage()")
-        db.hourlyAverage()
-        Log.d("WeatherDataWorker", "Worker completed successfully.")
-        return Result.success()
+        return try {
+            Log.d("WeatherDataWorker", "Worker is executing hourlyAverage()")
+            db.hourlyAverage()
+            Log.d("WeatherDataWorker", "Worker completed successfully.")
+            Result.success()
+        } catch (e: Exception) {
+            Log.e("WeatherDataWorker", "Error during Worker execution: ${e.message}", e)
+            Result.failure()
+        }
     }
 }
