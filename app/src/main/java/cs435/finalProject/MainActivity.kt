@@ -59,6 +59,7 @@ class MainActivity : AppCompatActivity() {
         timestamp = findViewById(R.id.timestamp)
 
         startWeatherFetch()
+        WorkManager.getInstance(this).cancelAllWorkByTag("WeatherWorker")
         scheduleQuarterWorker()
     }
 
@@ -149,10 +150,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun scheduleQuarterWorker() {
+        //https://developer.android.com/develop/background-work/background-tasks/persistent/getting-started/define-work#tag_work
         //https://developer.android.com/develop/background-work/background-tasks/persistent/how-to/manage-work
-        val workRequest = PeriodicWorkRequestBuilder<HourlyWorker>(15, TimeUnit.MINUTES).build()
+        val workRequest = PeriodicWorkRequestBuilder<HourlyWorker>(15, TimeUnit.MINUTES)
+            .addTag("WeatherWorker")
+            .build()
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "WeatherWorker",
+            "UniqueWeatherWorker",
             ExistingPeriodicWorkPolicy.KEEP,
             workRequest
         )
