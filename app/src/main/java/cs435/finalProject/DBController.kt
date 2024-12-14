@@ -22,7 +22,7 @@ class DBController (context: Context): SQLiteOpenHelper(context, DATABASE_NAME, 
     override fun onCreate(db: SQLiteDatabase?) {
         val createTable = """
             CREATE TABLE WeatherData (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                _id INTEGER PRIMARY KEY AUTOINCREMENT,
                 date TEXT NOT NULL,
                 temperature REAL NOT NULL,
                 humidity REAL NOT NULL,
@@ -33,12 +33,12 @@ class DBController (context: Context): SQLiteOpenHelper(context, DATABASE_NAME, 
 
         val createHourlyTable = """
             CREATE TABLE HourlyWeatherData (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            hour TEXT NOT NULL,
-            avg_temperature REAL NOT NULL,
-            avg_humidity REAL NOT NULL,
-            avg_uvi REAL NOT NULL,
-            avg_windspeed REAL NOT NULL
+                _id INTEGER PRIMARY KEY AUTOINCREMENT,
+                hour TEXT NOT NULL,
+                avg_temperature REAL NOT NULL,
+                avg_humidity REAL NOT NULL,
+                avg_uvi REAL NOT NULL,
+                avg_windspeed REAL NOT NULL
         );
         """.trimIndent()
 
@@ -49,6 +49,7 @@ class DBController (context: Context): SQLiteOpenHelper(context, DATABASE_NAME, 
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         db?.execSQL("DROP TABLE IF EXISTS WeatherData")
+        db?.execSQL("DROP TABLE IF EXISTS HourlyWeatherData")
         onCreate(db)
         Log.d(TAG, "Database upgraded. V:$newVersion")
     }
@@ -139,5 +140,15 @@ class DBController (context: Context): SQLiteOpenHelper(context, DATABASE_NAME, 
             GROUP BY hour;
         """.trimIndent()
         db.execSQL(query)
+    }
+
+    fun getHourlyWeather(): Cursor {
+        val db = readableDatabase
+        val query = """
+            SELECT _id, hour, avg_temperature 
+            FROM HourlyWeatherData 
+            ORDER BY hour DESC
+        """.trimIndent()
+        return db.rawQuery(query, null)
     }
 }
