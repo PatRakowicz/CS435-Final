@@ -124,7 +124,7 @@ class MainActivity : AppCompatActivity() {
 
     // https://medium.com/androiddevelopers/workmanager-periodicity-ff35185ff006
     private fun scheduleWorker() {
-        val workRequest = PeriodicWorkRequestBuilder<cs435.finalProject.Worker>(1, TimeUnit.HOURS).build()
+        val workRequest = PeriodicWorkRequestBuilder<cs435.finalProject.Worker>(15, TimeUnit.MINUTES).build()
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             "WeatherDataWorker",
             ExistingPeriodicWorkPolicy.KEEP,

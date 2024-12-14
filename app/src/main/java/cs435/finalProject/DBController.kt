@@ -132,17 +132,16 @@ class DBController (context: Context): SQLiteOpenHelper(context, DATABASE_NAME, 
     fun hourlyAverage() {
         val db = writableDatabase
         val query = """
-            INSERT INTO HourlyWeatherData (hour, avg_temperature, avg_humidity, avg_uvi, avg_windspeed)
-            SELECT strftime('%Y-%m-%d %H:00:00', date) as hour,
-                AVG(temperature), AVG(humidity), AVG(uvi), AVG(windspeed)
-            FROM WeatherData
-            WHERE date >= datetime('now', '-1 hour') AND date <= datetime('now')
-            GROUP BY hour;
-        """.trimIndent()
+        INSERT INTO HourlyWeatherData (hour, avg_temperature, avg_humidity, avg_uvi, avg_windspeed)
+        SELECT strftime('%Y-%m-%d %H:%M:00', date) as hour,
+            AVG(temperature), AVG(humidity), AVG(uvi), AVG(windspeed)
+        FROM WeatherData
+        WHERE date >= datetime('now', '-15 minutes') AND date <= datetime('now')
+        GROUP BY hour;
+    """.trimIndent()
         db.execSQL(query)
-
-        db.delete("WeatherData", "date <= datetime('now', '-1 hour')", null)
-        Log.d(TAG, "Hourly average found and old weather data deleted.")
+        db.delete("WeatherData", "date <= datetime('now', '-15 minutes')", null)
+        Log.d(TAG, "15-minute average computed and old data deleted.")
     }
 
     fun getHourlyWeather(): Cursor {
