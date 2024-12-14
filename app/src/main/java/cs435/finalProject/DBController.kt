@@ -107,10 +107,12 @@ class DBController(context: Context) :
 
     fun getLatestWeatherEntry(): Map<String, Any>? {
         val db = readableDatabase
-        val query =
-            "SELECT date, temperature, humidity, uvi, windspeed FROM WeatherData ORDER BY date DESC LIMIT 1"
-
-        val cursor = db.rawQuery(query, null)
+        val cursor = db.query(
+            "WeatherData",
+            arrayOf("date", "temperature", "humidity", "uvi", "windspeed"),
+            null, null, null, null,
+            "date DESC", "1"
+        )
 
         if (cursor.moveToFirst()) {
             val date = cursor.getString(cursor.getColumnIndexOrThrow("date"))
@@ -207,6 +209,10 @@ class DBController(context: Context) :
 
     fun getQuarterData(): Cursor {
         val db = readableDatabase
-        return db.rawQuery("SELECT * FROM QuarterlyWeatherData ORDER BY quarter DESC", null)
+        return db.query(
+            "QuarterlyWeatherData",
+            null, null, null, null, null,
+            "quarter DESC"
+        )
     }
 }
