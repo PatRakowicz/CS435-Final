@@ -140,6 +140,9 @@ class DBController (context: Context): SQLiteOpenHelper(context, DATABASE_NAME, 
             GROUP BY hour;
         """.trimIndent()
         db.execSQL(query)
+
+        db.delete("WeatherData", "date <= datetime('now', '-1 hour')", null)
+        Log.d(TAG, "Hourly average found and old weather data deleted.")
     }
 
     fun getHourlyWeather(): Cursor {
