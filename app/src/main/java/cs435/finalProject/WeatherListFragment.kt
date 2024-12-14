@@ -2,6 +2,7 @@ package cs435.finalProject
 
 import android.database.Cursor
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,10 @@ import android.widget.SimpleCursorAdapter
 class WeatherListFragment : Fragment() {
     private lateinit var db: DBController
     private lateinit var listView: ListView
+
+    companion object {
+        private const val TAG = "WeatherListFragment"
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,15 +31,21 @@ class WeatherListFragment : Fragment() {
     }
 
     private fun populateListView() {
-        val cursor: Cursor = db.getHourlyWeather()
-        val adapter = SimpleCursorAdapter(
-            requireContext(),
-            android.R.layout.simple_list_item_2,
-            cursor,
-            arrayOf("hour", "avg_temperature"),
-            intArrayOf(android.R.id.text1, android.R.id.text2),
-            0
-        )
-        listView.adapter = adapter
+        try {
+            val cursor: Cursor = db.getHourlyWeather()
+            Log.d(TAG, "populateListView: Cursor loaded with ${cursor.count} rows.")
+            val adapter = SimpleCursorAdapter(
+                requireContext(),
+                android.R.layout.simple_list_item_2,
+                cursor,
+                arrayOf("hour", "avg_temperature"),
+                intArrayOf(android.R.id.text1, android.R.id.text2),
+                0
+            )
+            listView.adapter = adapter
+            Log.d(TAG, "populateListView: ListView adapter set.")
+        } catch (e: Exception) {
+            Log.e(TAG, "populateListView: Error loading data - ${e.message}", e)
+        }
     }
 }
