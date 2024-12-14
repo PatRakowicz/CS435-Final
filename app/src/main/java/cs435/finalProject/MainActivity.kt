@@ -10,11 +10,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.Worker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
     private lateinit var db : DBController
@@ -110,5 +115,10 @@ class MainActivity : AppCompatActivity() {
                 Log.w(TAG, "UI update failed: No data found in database.")
             }
         }
+    }
+
+    private fun scheduleWorker() {
+        val workRequest = PeriodicWorkRequestBuilder<Worker>(1, TimeUnit.HOURS).build()
+        WorkManager.getInstance(this).enqueue(workRequest)
     }
 }

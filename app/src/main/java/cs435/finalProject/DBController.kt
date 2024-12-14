@@ -127,4 +127,17 @@ class DBController (context: Context): SQLiteOpenHelper(context, DATABASE_NAME, 
             return null
         }
     }
+
+    fun hourlyAverage() {
+        val db = writableDatabase
+        val query = """
+            INSERT INTO HourlyWeatherData (hour, avg_temperature, avg_humidity, avg_uvi, avg_windspeed)
+            SELECT strftime('%Y-%m-%d %H:00:00', date) as hour,
+                AVG(temperature), AVG(humidity), AVG(uvi), AVG(windspeed)
+            FROM WeatherData
+            WHERE date >= datetime('now', '-1 hour') AND date <= datetime('now')
+            GROUP BY hour;
+        """.trimIndent()
+        db.execSQL(query)
+    }
 }
