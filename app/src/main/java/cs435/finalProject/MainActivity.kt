@@ -139,7 +139,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun scheduleQuarterWorker() {
+        //https://developer.android.com/develop/background-work/background-tasks/persistent/how-to/manage-work
         val workRequest = PeriodicWorkRequestBuilder<HourlyWorker>(15, TimeUnit.MINUTES).build()
-        WorkManager.getInstance(this).enqueue(workRequest)
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "WeatherWorker",
+            ExistingPeriodicWorkPolicy.KEEP,
+            workRequest
+        )
     }
 }
