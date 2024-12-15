@@ -36,9 +36,9 @@ class WeatherListFragment : Fragment() {
         try {
             if (cursor.count == 0) {
                 Toast.makeText(requireContext(), "No weather data available.", Toast.LENGTH_SHORT).show()
-                Log.w(TAG, "populateListView: No data found.")
+//                Log.w(TAG, "populateListView: No data found.")
             } else {
-                Log.d(TAG, "populateListView: Cursor loaded with ${cursor.count} rows.")
+//                Log.d(TAG, "populateListView: Cursor loaded with ${cursor.count} rows.")
                 val adapter = SimpleCursorAdapter(
                     requireContext(),
                     android.R.layout.simple_list_item_2,

@@ -91,11 +91,11 @@ class DBController(context: Context) :
                     put("windspeed", windspeed)
                 }
                 db.insert("WeatherData", null, contentValue)
-                Log.d(TAG, "Data inserted successfully: $contentValue")
+//                Log.d(TAG, "Data inserted successfully: $contentValue")
             } else {
                 Log.e(
                     TAG,
-                    "Failed to fetch weather data. Response Code: ${httpURLConnection.responseCode}"
+                    "Failed to fetch weather data | ${httpURLConnection.responseCode}"
                 )
             }
         } catch (e: Exception) {
@@ -154,7 +154,7 @@ class DBController(context: Context) :
             0
         }
         cursor.close()
-        Log.d(TAG, "Current number of entries in WeatherData: $rowCount")
+//        Log.d(TAG, "Current number of entries in WeatherData: $rowCount")
 
         if (rowCount >= 15) {
             val currentQuarter =
@@ -193,10 +193,10 @@ class DBController(context: Context) :
                 try {
                     //https://stackoverflow.com/questions/38225725/android-when-does-insertorthrow-throw-an-exception
                     db.insertOrThrow("QuarterlyWeatherData", null, contentValues)
-                    Log.d(TAG, "Data pushed to QuarterlyWeatherData: $contentValues")
+//                    Log.d(TAG, "Data pushed to QuarterlyWeatherData: $contentValues")
 
                     db.execSQL("DELETE FROM WeatherData WHERE _id IN (SELECT _id FROM WeatherData ORDER BY _id DESC LIMIT 15)")
-                    Log.d(TAG, "Deleted 15 most recent entries from WeatherData.")
+//                    Log.d(TAG, "Deleted 15 most recent entries from WeatherData.")
                 } catch (e: Exception) {
                     Log.e(TAG, "Duplicate quarter entry detected, skipping insertion.")
                 }
