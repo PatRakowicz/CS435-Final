@@ -5,9 +5,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.widget.RemoteViews
 
-/**
- * Implementation of App Widget functionality.
- */
+// https://developer.android.com/develop/ui/views/appwidgets
 class WeatherWidget : AppWidgetProvider() {
     override fun onUpdate(
         context: Context,
@@ -34,11 +32,22 @@ internal fun updateAppWidget(
     appWidgetManager: AppWidgetManager,
     appWidgetId: Int
 ) {
-    val widgetText = context.getString(R.string.appwidget_text)
-    // Construct the RemoteViews object
-    val views = RemoteViews(context.packageName, R.layout.weather_widget)
-    views.setTextViewText(R.id.appwidget_text, widgetText)
+    val db = DBController(context)
+    val cursor = db.getQuarterData()
 
-    // Instruct the widget manager to update the widget
+    val views = RemoteViews(context.packageName, R.layout.weather_widget)
+
+    if (cursor.moveToFirst()) {
+        val latestQuarter = cursor.getString(cursor.getColumnIndexOrThrow("quarter"))
+        val avgTemp = cursor.getDouble(cursor.getColumnIndexOrThrow("avg_temperature"))
+
+        views.setTextViewText(R.id.appwidget_text, latestQuarter)
+        views.setTextViewText(R.id.appwidget_subtext, "Avg Temp: %.2f°C".format(avgTemp))
+    } else {
+        views.setTextViewText(R.id.appwidget_text, "No Data Available")
+        views.setTextViewText(R.id.appwidget_subtext, "")
+    }
+    cursor.close()
+
     appWidgetManager.updateAppWidget(appWidgetId, views)
 }
