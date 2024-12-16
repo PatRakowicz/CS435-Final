@@ -50,14 +50,16 @@ class WeatherListFragment : Fragment() {
                     if (cursor.moveToPosition(position)) {
                         val quarter = cursor.getString(cursor.getColumnIndexOrThrow("quarter"))
                         val avgTemperature = cursor.getString(cursor.getColumnIndexOrThrow("avg_temperature"))
-                        val humidity = cursor.getString(cursor.getColumnIndexOrThrow("humidity"))
-                        val windSpeed = cursor.getString(cursor.getColumnIndexOrThrow("wind_speed"))
+                        val humidity = cursor.getString(cursor.getColumnIndexOrThrow("avg_humidity"))
+                        val uvi = cursor.getString(cursor.getColumnIndexOrThrow("avg_uvi"))
+                        val windSpeed = cursor.getString(cursor.getColumnIndexOrThrow("avg_windspeed"))
 
                         val intent = Intent(requireContext(), WeatherDetailActivity::class.java)
                         intent.putExtra("quarter", quarter)
-                        intent.putExtra("avg_temperature", avgTemperature)
+                        intent.putExtra("temp", avgTemperature)
                         intent.putExtra("humidity", humidity)
-                        intent.putExtra("wind_speed", windSpeed)
+                        intent.putExtra("uvi", uvi)
+                        intent.putExtra("windSpeed", windSpeed)
                         startActivity(intent)
                     }
                 }
