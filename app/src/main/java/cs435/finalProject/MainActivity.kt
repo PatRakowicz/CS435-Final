@@ -133,6 +133,8 @@ class MainActivity : AppCompatActivity() {
                 timestamp.text = "Last Update: ${latestWeather["date"]}"
 //                Log.d(TAG, "UI updated with latest weather data.")
 
+
+                // Not working
                 val textAlignment =
                     if (AppSettings.isCenteredText) View.TEXT_ALIGNMENT_CENTER
                     else View.TEXT_ALIGNMENT_TEXT_START
