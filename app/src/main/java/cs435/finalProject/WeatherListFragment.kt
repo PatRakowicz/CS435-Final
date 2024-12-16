@@ -1,5 +1,6 @@
 package cs435.finalProject
 
+import android.content.Intent
 import android.database.Cursor
 import android.os.Bundle
 import android.util.Log
@@ -27,11 +28,7 @@ class WeatherListFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_weather_list, container, false)
         db = DBController(requireContext())
         listView = view.findViewById(R.id.listView)
-        populateListView()
-        return view
-    }
 
-    private fun populateListView() {
         val cursor: Cursor = db.getQuarterData()
         try {
             if (cursor.count == 0) {
@@ -48,9 +45,23 @@ class WeatherListFragment : Fragment() {
                     0
                 )
                 listView.adapter = adapter
+
+                listView.setOnItemClickListener { parent, view, position, id ->
+                    if (cursor.moveToPosition(position)) {
+                        val quarter = cursor.getString(cursor.getColumnIndexOrThrow("quarter"))
+                        val avgTemperature = cursor.getString(cursor.getColumnIndexOrThrow("avg_temperature"))
+
+                        val intent = Intent(requireContext(), WeatherDetailActivity::class.java)
+                        intent.putExtra("quarter", quarter)
+                        intent.putExtra("avg_temperature", avgTemperature)
+                        startActivity(intent)
+                    }
+                }
             }
         } catch (e: Exception) {
             Log.e(TAG, "populateListView: Error loading data - ${e.message}", e)
         }
+
+        return view
     }
 }
