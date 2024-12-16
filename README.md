@@ -31,5 +31,6 @@ start the python app, it will display different IPs its using. For example `127.
 you are on a private network `10.#.#.#:8000`
 
 ### How it works
-The idea is to have the python application running in the background that will have an exposed port `8000`,
-then allow for every request happening to the python application it will randomly grab a value from a given range.
+The Python application runs a Flask server on port `8000`, exposing an API endpoint at `/api/weather`. Each API request 
+triggers the generation of randomized weather data, including temperature, humidity, UV index, and wind speed. 
+The simulated data also includes a timestamp that increments by one minute with each request.
