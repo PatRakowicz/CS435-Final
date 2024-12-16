@@ -20,11 +20,17 @@ class WeatherDetailActivity : AppCompatActivity() {
 
         val quarterTextView: TextView = findViewById(R.id.quarterTextView)
         val avgTemperatureTextView: TextView = findViewById(R.id.avgTemperatureTextView)
+        val humidityTextView: TextView = findViewById(R.id.humidityTextView)
+        val windSpeedTextView: TextView = findViewById(R.id.windSpeedTextView)
 
         val quarter = intent.getStringExtra("quarter")
         val avgTemperature = intent.getStringExtra("avg_temperature")
+        val humidity = intent.getStringExtra("humidity")
+        val windSpeed = intent.getStringExtra("wind_speed")
 
         quarterTextView.text = "Quarter: $quarter"
         avgTemperatureTextView.text = "Average Temperature: $avgTemperature"
+        humidityTextView.text = "Humidity: $humidity"
+        windSpeedTextView.text = "Wind Speed: $windSpeed"
     }
 }
