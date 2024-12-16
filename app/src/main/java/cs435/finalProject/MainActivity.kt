@@ -13,7 +13,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import kotlinx.coroutines.CoroutineScope
@@ -152,7 +151,7 @@ class MainActivity : AppCompatActivity() {
     private fun scheduleQuarterWorker() {
         //https://developer.android.com/develop/background-work/background-tasks/persistent/getting-started/define-work#tag_work
         //https://developer.android.com/develop/background-work/background-tasks/persistent/how-to/manage-work
-        val workRequest = PeriodicWorkRequestBuilder<HourlyWorker>(15, TimeUnit.MINUTES)
+        val workRequest = PeriodicWorkRequestBuilder<QuarterWorker>(15, TimeUnit.MINUTES)
             .addTag("WeatherWorker")
             .build()
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(

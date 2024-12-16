@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 
-class HourlyWorker(context: Context, workerParameters: WorkerParameters) : Worker(context, workerParameters) {
+class QuarterWorker(context: Context, workerParameters: WorkerParameters) : Worker(context, workerParameters) {
     companion object {
         private const val TAG = "HourlyWorker"
     }
