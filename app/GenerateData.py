@@ -1,12 +1,19 @@
+# Documents
+# https://www.geeksforgeeks.org/python-pytz/
+# https://flask.palletsprojects.com/en/stable/quickstart/
+# https://www.w3schools.com/python/ref_random_uniform.asp
+
 from flask import Flask, jsonify
 from random import uniform
 from datetime import datetime, timedelta
+import pytz
 
 app = Flask(__name__)
 
-simulated_time = datetime.utcnow()
+mountain_tz = pytz.timezone("America/Denver")
+simulated_time = datetime.now(mountain_tz)
 
-def generate_weather_data():
+def GenData():
     return {
         "temperature": round(uniform(20.0, 35.0), 2),
         "humidity": round(uniform(40.0, 90.0), 2),
@@ -18,12 +25,10 @@ def generate_weather_data():
 @app.route('/api/weather', methods=['GET'])
 def get_weather():
     global simulated_time
+    weather_data = GenData()
 
-    weather_data = generate_weather_data()
     weather_data["timestamp"] = simulated_time.strftime("%Y-%m-%dT%H:%M:%S")
-
     print(f"Generated Weather Data: {weather_data}")
-
     simulated_time += timedelta(minutes=1)
 
     return jsonify(weather_data)
