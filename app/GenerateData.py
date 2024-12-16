@@ -2,6 +2,7 @@
 # https://www.geeksforgeeks.org/python-pytz/
 # https://flask.palletsprojects.com/en/stable/quickstart/
 # https://www.w3schools.com/python/ref_random_uniform.asp
+# https://www.geeksforgeeks.org/use-jsonify-instead-of-json-dumps-in-flask/#
 
 from flask import Flask, jsonify
 from random import uniform
