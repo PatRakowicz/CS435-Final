@@ -16,6 +16,13 @@ the base process of the app is every request will happen each minute, populating
 Then every 15 minutes, it will grab the average from all of the minute entries into one 15 minute entry, then it will
 populate a list view with the data, data being the time and date with the average temperature.
 
+### Widget example | How to use
+Given that this application uses a widget, the idea behind this is to allow for the application to be running on the background
+then allow for a widget on the main page to update based of the latest 15 minute average grab. This can be setup
+by going to the home page of the android app, long press on the empty space, then selecting the apps widget in the list provided.
+Then resize the widget to allow for the data inside of the widget to be viewed. Given that the widget has its own timer for grabbing data
+the data refresh will happen every 10 minutes.
+
 Local Data Generator (Python)
 ------
 With this project the idea is to have a micro controller that will have wifi access
