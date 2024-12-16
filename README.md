@@ -4,17 +4,17 @@ that is hosted on a ESP32 (micro controller) that has a wifi component. It will 
 then push that data to a http webapp hosted on the controller. Given the controller has a wifi component,
 it will allow the app to connect to the controller and use `GET` requests to fetch the give data.
 
-## Process of the application
-Given this application and the use is for a personal weather station that can be viewed off an app on the phone,
-the base process of the app is every request will happen each minute, populating the given text on the `MainActivity`.
-Then every 15 minutes, it will grab the average from all of the minute entries into one 15 minute entry, then it will
-populate a list view with the data, data being the time and date with the average temperature.
-
 ## How to run the Android app
 There is nothing special on running the app, just copy the repo to a given place, open it with android studio
 then allow for the gradle to build the app. Then hit the run button, everything should be configured to work off
 the bat. Read How to run Data Generator for more information. If the application is not showing any data, you might
 have to change what IP the android app is listening on. This can be done on line 102 on `MainActivity`
+
+### Process of the application
+Given this application and the use is for a personal weather station that can be viewed off an app on the phone,
+the base process of the app is every request will happen each minute, populating the given text on the `MainActivity`.
+Then every 15 minutes, it will grab the average from all of the minute entries into one 15 minute entry, then it will
+populate a list view with the data, data being the time and date with the average temperature.
 
 Local Data Generator (Python)
 ------
