@@ -23,7 +23,7 @@ to an api request. With this in mind there is a python file `./app/GenerateData.
 This allows for an example of what type of data would be sent to the app, with api requests
 and a json response for the application to use.
 
-## How to run Data Generator
+### How to run Data Generator
 It is very simple to get this data generator up and running. All is needed is to `cd` into the `/app` directory,
 then proceed to run `python GenerateData.py`. This will start the python flask that will host a simple json request
 form to allow for the app to grab that data. To find what types of IPs the application it is running on, once you
