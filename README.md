@@ -1,4 +1,4 @@
-# CS435-Final
+# CS435-Final | Android app to view ESP32 Device
 This is the final project for android development. The idea is to have a "personal" weather station
 that is hosted on a ESP32 (micro controller) that has a wifi component. It will grab data from sensors
 then push that data to a http webapp hosted on the controller. Given the controller has a wifi component,
